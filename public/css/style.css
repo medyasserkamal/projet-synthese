@@ -1,0 +1,746 @@
+/* 
+ * 1. Reset & Base 
+ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-y: scroll;
+    transition: background-color 0.4s ease, color 0.4s ease;
+}
+a { text-decoration: none; color: inherit; }
+ul { list-style: none; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+/* 
+ * 2. Design Tokens (Humanized UI)
+ */
+:root {
+    /* Couleurs Light Mode (Blanc & Bleu Ciel) */
+    --bg-color: #f8fafc;
+    --surface-color: #ffffff;
+    --text-color: #1e293b;
+    --text-muted: #64748b;
+    --primary-color: #0ea5e9; /* Bleu Ciel */
+    --primary-hover: #0284c7;
+    --border-color: #e2e8f0;
+    --accent-red: #ef4444;
+    --accent-green: #10b981;
+    
+    /* Humanized UI : Softness & Shadows */
+    --radius-sm: 8px;
+    --radius-md: 16px;
+    --radius-lg: 24px;
+    --radius-pill: 50px;
+    
+    --shadow-sm: 0 2px 4px rgba(14, 165, 233, 0.05);
+    --shadow-md: 0 4px 15px rgba(14, 165, 233, 0.08);
+    --shadow-lg: 0 10px 25px rgba(14, 165, 233, 0.12);
+    --shadow-hover: 0 15px 30px rgba(14, 165, 233, 0.2);
+    
+    --transition-bounce: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    --transition-smooth: all 0.3s ease;
+}
+
+[data-theme="dark"] {
+    /* Couleurs Dark Mode (Noir & Bleu Ciel) */
+    --bg-color: #0a0a0a;
+    --surface-color: #121212;
+    --text-color: #f1f5f9;
+    --text-muted: #94a3b8;
+    --primary-color: #00bfff;
+    --primary-hover: #38bdf8;
+    --border-color: #27272a;
+    
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 15px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.5);
+    --shadow-hover: 0 15px 30px rgba(0, 191, 255, 0.15);
+}
+
+/* 
+ * 3. Layout principal (3 colonnes CSS Grid)
+ */
+.app-container {
+    display: grid;
+    grid-template-columns: 280px minmax(500px, 1fr) 350px;
+    gap: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1rem 2rem;
+    min-height: 100vh;
+}
+
+/* 
+ * 4. Navigation gauche (nav sticky)
+ */
+.left-nav {
+    position: sticky;
+    top: 2rem;
+    height: calc(100vh - 4rem);
+    display: flex;
+    flex-direction: column;
+}
+.brand-logo {
+    font-family: 'Outfit', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 3rem;
+    color: var(--text-color);
+}
+.brand-logo svg { fill: var(--primary-color); }
+.nav-menu { display: flex; flex-direction: column; gap: 0.5rem; }
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    border-radius: var(--radius-pill);
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-color);
+    transition: var(--transition-bounce);
+}
+.nav-item:hover, .nav-item.active {
+    background-color: rgba(14, 165, 233, 0.1);
+    color: var(--primary-color);
+    transform: translateX(5px);
+}
+.nav-btn {
+    margin-top: 2rem;
+    background-color: var(--primary-color);
+    color: #fff;
+    padding: 1rem;
+    border-radius: var(--radius-pill);
+    font-weight: 700;
+    font-size: 1.1rem;
+    text-align: center;
+    box-shadow: var(--shadow-md);
+    transition: var(--transition-bounce);
+}
+.nav-btn:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: var(--shadow-hover);
+}
+
+/* 
+ * 5. Avatar générique (réutilisable)
+ */
+.avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: var(--border-color);
+    border: 2px solid transparent;
+    transition: var(--transition-smooth);
+}
+.avatar:hover { border-color: var(--primary-color); }
+
+/* 
+ * 6. Feed principal
+ */
+.feed {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+.feed-header {
+    background: var(--surface-color);
+    padding: 1.5rem;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    backdrop-filter: blur(10px);
+}
+.feed-title { font-family: 'Outfit', sans-serif; font-size: 1.5rem; font-weight: 700; }
+
+/* 
+ * 7. Article Card standard & 8. Featured
+ */
+.article-card {
+    background: var(--surface-color);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    transition: var(--transition-bounce);
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+}
+.article-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+    border-color: rgba(14, 165, 233, 0.3);
+}
+.article-card.featured {
+    grid-column: 1 / -1;
+    border-radius: var(--radius-lg);
+}
+.article-card.featured .article-image { height: 350px; }
+.article-image {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+.article-card:hover .article-image { transform: scale(1.03); }
+.article-content { padding: 1.5rem; }
+.article-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    line-height: 1.3;
+}
+.featured .article-title { font-size: 2rem; }
+.article-excerpt {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin-bottom: 1.25rem;
+}
+.article-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+.author-info { display: flex; align-items: center; gap: 0.75rem; }
+.author-name { font-weight: 600; font-size: 0.9rem; }
+.article-date { font-size: 0.8rem; color: var(--text-muted); }
+
+/* 
+ * 9. Tags / Badges
+ */
+.tag {
+    display: inline-block;
+    padding: 0.6rem 1.25rem;
+    border-radius: var(--radius-pill);
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: none; /* Plus "humain" que les majuscules */
+    letter-spacing: 0.2px;
+    background-color: rgba(14, 165, 233, 0.08);
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+    transition: var(--transition-bounce);
+    border: 1px solid transparent;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.tag:hover {
+    background-color: var(--primary-color);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2);
+}
+
+.category-list {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+/* 
+ * 10. Sidebar droite & 12. Widget Box
+ */
+.right-sidebar {
+    position: sticky;
+    top: 2rem;
+    height: calc(100vh - 4rem);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding-right: 0.5rem;
+}
+
+input, textarea, select {
+    width: 100%;
+    padding: 0.85rem 1.1rem;
+    margin-top: 0.5rem;
+    margin-bottom: 1.25rem;
+    background-color: var(--bg-color);
+    border: 2px solid var(--border-color);
+    color: var(--text-color);
+    border-radius: var(--radius-md);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    transition: var(--transition-smooth);
+    outline: none;
+}
+
+input::placeholder, textarea::placeholder {
+    color: var(--text-muted);
+    opacity: 0.6;
+}
+
+input:focus, textarea:focus, select:focus {
+    border-color: var(--primary-color);
+    background-color: var(--surface-color);
+    box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1);
+    transform: translateY(-1px);
+}
+
+input:hover, textarea:hover, select:hover {
+    border-color: var(--primary-color);
+    opacity: 0.9;
+}
+
+.widget-box {
+    background: var(--surface-color);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+}
+.widget-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+}
+
+/* 
+ * 11. Barre de recherche (Spécifique)
+ */
+.search-bar {
+    display: flex;
+    align-items: center;
+    background: var(--surface-color);
+    border-radius: var(--radius-pill);
+    padding: 0.25rem 1.25rem;
+    border: 2px solid var(--border-color);
+    transition: var(--transition-smooth);
+}
+
+.search-bar:focus-within {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1);
+}
+
+.search-bar input {
+    border: none !important;
+    background: none !important;
+    margin: 0 !important;
+    padding: 0.75rem 0.5rem !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+/* 
+ * 13. Trending items
+ */
+.trending-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+.trending-item:last-child { border-bottom: none; }
+.trending-item:hover .trending-title { color: var(--primary-color); }
+.trending-meta { font-size: 0.75rem; color: var(--text-muted); }
+.trending-title { font-weight: 600; font-size: 0.95rem; }
+
+/* 
+ * 14. Sources à suivre (follow)
+ */
+.follow-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+.follow-btn {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    padding: 0.4rem 1rem;
+    border-radius: var(--radius-pill);
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: var(--transition-bounce);
+}
+.follow-btn:hover {
+    background-color: var(--primary-color);
+    color: #fff;
+    border-color: var(--primary-color);
+}
+
+/* 
+ * 15. Newsletter widget
+ */
+.newsletter-widget {
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.1), rgba(14, 165, 233, 0.02));
+    border-color: rgba(14, 165, 233, 0.3);
+}
+.newsletter-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    margin-bottom: 0.5rem;
+    background: var(--surface-color);
+    color: var(--text-color);
+}
+.newsletter-btn {
+    width: 100%;
+    background: var(--primary-color);
+    color: #fff;
+    padding: 0.75rem;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+}
+
+/* 
+ * 16. Footer sidebar
+ */
+.footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    padding: 0 1rem;
+}
+.footer-links a:hover { color: var(--primary-color); text-decoration: underline; }
+
+/* 
+ * 17. Scrollbar custom
+ */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* 
+ * 18. Animations & micro-interactions
+ */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.animate-fade-in { animation: fadeIn 0.5s ease forwards; }
+.pulse-hover:hover { animation: pulse 1s infinite; }
+@keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+
+/* 
+ * 19. Responsive (tablet + mobile)
+ */
+@media (max-width: 1024px) {
+    .app-container { grid-template-columns: 80px minmax(400px, 1fr) 300px; padding: 1rem; }
+    .nav-item span, .brand-logo span { display: none; }
+    .nav-item { justify-content: center; padding: 1rem; }
+    .nav-btn { display: none; }
+}
+@media (max-width: 768px) {
+    .app-container { grid-template-columns: 1fr; }
+    .left-nav, .right-sidebar { display: none; } /* On cache pour l'instant sur mobile, ou on met une bottom nav */
+}
+
+/* 
+ * 20. Utilitaires
+ */
+.text-center { text-align: center; }
+.mt-1 { margin-top: 0.5rem; }
+.mt-2 { margin-top: 1rem; }
+.mb-1 { margin-bottom: 0.5rem; }
+.mb-2 { margin-bottom: 1rem; }
+.d-flex { display: flex; }
+.align-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+
+/* 
+ * 21. Search Results & User Profiles
+ */
+.search-section {
+    margin-bottom: 2.5rem;
+}
+.search-section-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-color);
+}
+.search-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.25rem;
+}
+.user-card {
+    background: var(--surface-color);
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: var(--transition-bounce);
+}
+.user-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-color);
+}
+.user-card-info {
+    flex: 1;
+}
+.user-card-name {
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+}
+.user-card-stats {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+/* Profile Page */
+.profile-header {
+    background: var(--surface-color);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-md);
+}
+.profile-cover {
+    height: 150px;
+    background: linear-gradient(135deg, var(--primary-color), #0ea5e9);
+    opacity: 0.8;
+}
+.profile-info-container {
+    padding: 0 2rem 2rem;
+    position: relative;
+    margin-top: -50px;
+}
+.profile-avatar-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 1.5rem;
+}
+.profile-avatar-big {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 5px solid var(--surface-color);
+    background: var(--surface-color);
+    object-fit: cover;
+    box-shadow: var(--shadow-lg);
+}
+.profile-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+.profile-name {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.75rem;
+    font-weight: 800;
+    margin-bottom: 0.25rem;
+}
+.profile-handle {
+    color: var(--text-muted);
+    font-size: 1rem;
+    margin-bottom: 1rem;
+}
+.profile-bio {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+    max-width: 600px;
+}
+.profile-stats-row {
+    display: flex;
+    gap: 2rem;
+}
+.profile-stat {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+}
+.profile-stat b {
+    color: var(--text-color);
+    font-weight: 700;
+}
+.profile-stat span {
+    color: var(--text-muted);
+}
+
+.btn-follow {
+    background: var(--text-color);
+    color: var(--bg-color);
+    padding: 0.6rem 1.5rem;
+    border-radius: var(--radius-pill);
+    font-weight: 700;
+    transition: var(--transition-bounce);
+}
+.btn-follow:hover {
+    opacity: 0.9;
+    transform: scale(1.05);
+}
+.btn-unfollow {
+    background: transparent;
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    padding: 0.6rem 1.5rem;
+    border-radius: var(--radius-pill);
+    font-weight: 700;
+    transition: var(--transition-bounce);
+}
+.btn-unfollow:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--accent-red);
+    border-color: var(--accent-red);
+}
+
+.profile-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 1.5rem;
+}
+.profile-tab {
+    padding: 1rem 1.5rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    border-bottom: 3px solid transparent;
+    transition: var(--transition-smooth);
+}
+.profile-tab.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+.profile-tab:hover:not(.active) {
+    color: var(--text-color);
+}
+
+/* 
+ * 22. Action Buttons (Modifier, Supprimer, Voir)
+ */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 0.7rem 1.5rem;
+    border-radius: var(--radius-md);
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: var(--transition-bounce);
+    border: none;
+    text-decoration: none;
+    line-height: 1;
+    background-color: var(--primary-color);
+    color: white !important;
+}
+
+.btn:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2);
+}
+
+.btn-sm {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+}
+
+.btn-edit {
+    background-color: var(--primary-color);
+    color: white !important;
+}
+
+.btn-edit:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+}
+
+.btn-delete {
+    background-color: var(--accent-red);
+    color: white !important;
+}
+
+.btn-delete:hover {
+    background-color: #dc2626;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.btn-view {
+    background-color: rgba(14, 165, 233, 0.1);
+    color: var(--primary-color) !important;
+    border: 1px solid rgba(14, 165, 233, 0.2);
+}
+
+.btn-view:hover {
+    background-color: var(--primary-color);
+    color: white !important;
+    transform: translateY(-2px);
+}
+
+.btn i {
+    width: 16px;
+    height: 16px;
+}
+
+/* Icon Buttons (Minimalist) */
+.icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    transition: var(--transition-bounce);
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+
+.icon-btn:hover {
+    transform: scale(1.15);
+    background: rgba(14, 165, 233, 0.05);
+}
+
+.icon-btn-edit {
+    color: var(--primary-color) !important;
+}
+
+.icon-btn-edit:hover {
+    color: var(--primary-hover) !important;
+    background: rgba(14, 165, 233, 0.1);
+}
+
+.icon-btn-delete {
+    color: var(--accent-red) !important;
+}
+
+.icon-btn-delete:hover {
+    color: #dc2626 !important;
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.icon-btn i {
+    width: 20px;
+    height: 20px;
+}
